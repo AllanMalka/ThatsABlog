@@ -1,0 +1,19 @@
+body {
+  background-color: #6c6c6c;
+}
+
+#wrapper {
+  margin: 0 auto;
+  width: 50%;
+  border: 1px solid #373737;
+  padding: 1em;
+  border-radius: 5px;
+}
+
+#wrapper div {
+  background-color: #c2c2c2;
+  border-radius: 5px;
+  padding: 0.2em 0.5em;
+  margin: 5px 0;
+}
+/*# sourceMappingURL=style.css.map */
