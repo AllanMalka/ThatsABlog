@@ -5,8 +5,8 @@ class dbConnection {
     private $password = "";
     private $dbname = "db_thatsablog";
     private $conn;
-    private $tblUsers = "tblUsers";
-    private $tblBlogs = "tblBlogs";
+    private $tblUsers = "tblusers";
+    private $tblBlogs = "tblblogs";
 
     function __construct(){
         $this->conn = new mysqli($this->servername, $this->username, $this->password, $this->dbname);
@@ -70,20 +70,19 @@ class dbConnection {
     function getAllBlogs(){
         $conn = $this->conn;
 
-        $query = "SELECT b.ID as BlogID, b.userID as UserID, b.title, b.content, b.dateCreation, b.dateUpdate, u.userName, u.email, u.dateCreation ";
-        $query .= "FROM $this->tblBlogs b INNER JOIN tbUsers u ON b.uid = u.id";
-        
+        $query = "SELECT b.ID as BlogID, b.userID, b.title, b.content, b.dateCreation, b.dateUpdate, u.userName, u.email, u.dateCreation ";
+        $query .= "FROM $this->tblBlogs b INNER JOIN $this->tblUsers u ON b.userID = u.ID";
+
         $res = $conn->query($query);
         
         $blogs = [];
         if($res && $res->num_rows > 0) {
             while($row = $res->fetch_assoc()){
-                $user = new User($row["UserID"], $row["userName"], $row["email"], $row["dateCreation"]);
+                $user = new User($row["userID"], $row["userName"], $row["email"], $row["dateCreation"]);
                 $blogs[] = new Blog($row["BlogID"], $user, $row["title"],$row["content"],$row["dateCreation"],$row["dateUpdate"]);
             }
         }
         $conn->close();
-
         return $blogs;
     }
     #endregion
@@ -105,6 +104,7 @@ class dbConnection {
             ID INT NOT NULL AUTO_INCREMENT,
             userName VARCHAR(255) NOT NULL, 
             email VARCHAR(255) NOT NULL, 
+            password VARCHAR(255) NOT NULL,
             dateCreation DATETIME DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (ID)
         );";
@@ -133,33 +133,41 @@ class dbConnection {
     #region Test Data
     function insertTestData(){
         $conn = $this->conn;
-        //password, hashing
-        $query = "INSERT INTO users (username, email) VALUES 
-                ('ghostperiodic', 'ghostperiodic@test.net', 'test'),
-                ('yoyomanager', 'yoyomanager@test.net', 'test'),
-                ('userfuzzy', 'userfuzzy@test.net', 'test'),
-                ('reforestmenty', 'reforestmenty@test.net', 'test'),
-                ('stonyslate', 'stonyslate@test.net', 'test'),
-                ('brandyyen', 'brandyyen@test.net', 'test'),
-                ('phoneprey', 'phoneprey@test.net', 'test'),
-                ('canglingelect', 'canglingelect@test.net', 'test'),
-                ('moorhensalsa', 'moorhensalsa@test.net', 'test'),
-                ('collectcumbrian', 'collectcumbrian@test.net', 'test'),
-                ('sankshrug', 'sankshrug@test.net', 'test'),
-                ('kyanitetumb', 'kyanitetumb@test.net', 'test'),
-                ('peanutprimary', 'peanutprimary@test.net', 'test'),
-                ('catenaryprofit', 'catenaryprofit@test.net', 'test'),
-                ('mewstingley', 'mewstingley@test.net', 'test'),
-                ('strathmoremocolate', 'strathmoremocolate@test.net', 'test'),
-                ('topsailevents', 'topsailevents@test.net', 'test'),
-                ('blockedscrand', 'blockedscrand@test.net', 'test'),
-                ('dealerdislocate', 'dealerdislocate@test.net', 'test'),
-                ('dreamunhealthy', 'dreamunhealthy@test.net', 'test'),
-                ('quesadillatesa', 'quesadillatesa@test.net', 'test'),
-                ('mulleredwind', 'mulleredwind@test.net', 'test'),
-                ('treasonvirtuous', 'treasonvirtuous@test.net', 'test'),
-                ('sparrowclimatic', 'sparrowclimatic@test.net', 'test'),
-                ('ceramicsmilo', 'ceramicsmilo@test.net', 'test')";
+        
+        $query = "INSERT INTO $this->tblUsers (username, email, password) VALUES";
+        $query .= " ('ghostperiodic', 'ghostperiodic@test.net', '".password_hash("test", PASSWORD_BCRYPT )."'),";
+        $query .= " ('yoyomanager', 'yoyomanager@test.net', '".password_hash("test", PASSWORD_BCRYPT )."'),";
+        $query .= " ('userfuzzy', 'userfuzzy@test.net', '".password_hash("test", PASSWORD_BCRYPT )."'),";
+        $query .= " ('reforestmenty', 'reforestmenty@test.net', '".password_hash("test", PASSWORD_BCRYPT )."'),";
+        $query .= " ('stonyslate', 'stonyslate@test.net', '".password_hash("test", PASSWORD_BCRYPT )."'),";
+        $query .= " ('brandyyen', 'brandyyen@test.net', '".password_hash("test", PASSWORD_BCRYPT )."'),";
+        $query .= " ('phoneprey', 'phoneprey@test.net', '".password_hash("test", PASSWORD_BCRYPT )."'),";
+        $query .= " ('canglingelect', 'canglingelect@test.net', '".password_hash("test", PASSWORD_BCRYPT )."'),";
+        $query .= " ('moorhensalsa', 'moorhensalsa@test.net', '".password_hash("test", PASSWORD_BCRYPT )."'),";
+        $query .= " ('collectcumbrian', 'collectcumbrian@test.net', '".password_hash("test", PASSWORD_BCRYPT )."'),";
+        $query .= " ('sankshrug', 'sankshrug@test.net', '".password_hash("test", PASSWORD_BCRYPT )."'),";
+        $query .= " ('kyanitetumb', 'kyanitetumb@test.net', '".password_hash("test", PASSWORD_BCRYPT )."'),";
+        $query .= " ('peanutprimary', 'peanutprimary@test.net', '".password_hash("test", PASSWORD_BCRYPT )."'),";
+        $query .= " ('catenaryprofit', 'catenaryprofit@test.net', '".password_hash("test", PASSWORD_BCRYPT )."'),";
+        $query .= " ('mewstingley', 'mewstingley@test.net', '".password_hash("test", PASSWORD_BCRYPT )."'),";
+        $query .= " ('strathmoremocolate', 'strathmoremocolate@test.net', '".password_hash("test", PASSWORD_BCRYPT )."'),";
+        $query .= " ('topsailevents', 'topsailevents@test.net', '".password_hash("test", PASSWORD_BCRYPT )."'),";
+        $query .= " ('blockedscrand', 'blockedscrand@test.net', '".password_hash("test", PASSWORD_BCRYPT )."'),";
+        $query .= " ('dealerdislocate', 'dealerdislocate@test.net', '".password_hash("test", PASSWORD_BCRYPT )."'),";
+        $query .= " ('dreamunhealthy', 'dreamunhealthy@test.net', '".password_hash("test", PASSWORD_BCRYPT )."'),";
+        $query .= " ('quesadillatesa', 'quesadillatesa@test.net', '".password_hash("test", PASSWORD_BCRYPT )."'),";
+        $query .= " ('mulleredwind', 'mulleredwind@test.net', '".password_hash("test", PASSWORD_BCRYPT )."'),";
+        $query .= " ('treasonvirtuous', 'treasonvirtuous@test.net', '".password_hash("test", PASSWORD_BCRYPT )."'),";
+        $query .= " ('sparrowclimatic', 'sparrowclimatic@test.net', '".password_hash("test", PASSWORD_BCRYPT )."'),";
+        $query .= " ('ceramicsmilo', 'ceramicsmilo@test.net', '".password_hash("test", PASSWORD_BCRYPT )."')";
+        $res = $conn->query($query);
+        if($res){
+            $query = "INSERT INTO $this->tblBlogs (userID, title, content) VALUES";
+            $query .= " ('1', 'Test', 'Bacon ipsum dolor amet flank doner pork swine ham frankfurter tri-tip, venison strip steak porchetta sausage picanha kevin. Burgdoggen chicken cupim pork drumstick, spare ribs pork loin sausage t-bone hamburger. T-bone andouille filet mignon, pork loin strip steak rump frankfurter burgdoggen turducken. Cow prosciutto bacon, pastrami spare ribs buffalo cupim beef ribs beef t-bone doner ball tip sausage pork capicola. Pork chop sirloin shoulder burgdoggen chuck. Short ribs cow shankle ribeye tri-tip pastrami burgdoggen.')";
+            $res = $conn->query($query);
+        }
+        $conn->close();
+        return $res;
     }
     #endregion
 
